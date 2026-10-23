@@ -49,9 +49,13 @@ export const recipeGuide = [
   { title: 'Continuous outcome', description: 'If skewed, compare raw and logged models. Reverse log(x + 1) predictions with exp(.pred) − 1.', tools: 'step_log(..., offset = 1)' },
   { title: 'Optional numeric tools', description: 'Standardize scales, remove highly correlated inputs, or create bins.', tools: 'step_normalize() / step_corr() / step_discretize()' },
 ];
-export const recipeBoxHeight = 780;
+export const recipeConcept = {
+  id: 'shared-recipe', phase: 'model', title: 'Preprocessing recipe',
+  subtitle: 'Learn on training data. Reuse for test data and counterfactuals.',
+};
+export const recipeBoxHeight = 150;
 export const graphWidth = 940;
-export const byId = Object.fromEntries(steps.map(step => [step.id, step]));
+export const byId = Object.fromEntries([...steps, recipeConcept].map(step => [step.id, step]));
 
 export function makeGraph(expanded) {
   let top = 0;

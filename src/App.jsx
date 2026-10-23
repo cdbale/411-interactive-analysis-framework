@@ -3,7 +3,7 @@ import { ReactFlow, Handle, Position, BaseEdge } from '@xyflow/react';
 import { ArrowUpRight, BookOpen, Check, ChevronDown, ChevronRight, Copy, FileText, GitBranch, Layers, List, Maximize2, Search, X } from 'lucide-react';
 import '@xyflow/react/dist/style.css';
 import './styles.css';
-import { phases, steps, byId, makeGraph, graphWidth, recipeGuide, recipeBoxHeight } from './workflow.js';
+import { phases, steps, byId, makeGraph, graphWidth, recipeGuide, recipeConcept, recipeBoxHeight } from './workflow.js';
 import frameworkPdf from '../analysis-framework.pdf?url';
 
 const Actions = createContext({});
@@ -38,10 +38,11 @@ function SummaryNode({ data }) {
   return <div className="summary-node" style={{ '--accent': data.color }}><Ports /><button className="nodrag" onClick={() => toggle(data.id)} aria-label={`Expand ${data.title}`}><strong>{data.title}</strong><span>{data.count} steps <ChevronDown size={14} /></span></button></div>;
 }
 function RecipeGuide() {
-  return <><strong className="recipe-guide-title">Preprocessing recipe</strong><p className="recipe-guide-intro">Choose steps for your variables; do not apply every step.</p><ul>{recipeGuide.map(item => <li key={item.title}><strong>{item.title}</strong><p>{item.description}</p>{item.tools && <code>{item.tools}</code>}</li>)}</ul><p className="recipe-guide-foot">Learn on training data. Reuse the finalized recipe for test data and counterfactuals.</p></>;
+  return <div className="recipe-guide"><p className="recipe-guide-intro">Choose steps for your variables; do not apply every step.</p><ul>{recipeGuide.map(item => <li key={item.title}><h3>{item.title}</h3><p>{item.description}</p>{item.tools && <code>{item.tools}</code>}</li>)}</ul><p className="recipe-guide-foot">Learn on training data. Reuse the finalized recipe for test data and counterfactuals.</p></div>;
 }
 function RecipeLabelNode() {
-  return <div className="recipe-label" style={{ height: recipeBoxHeight }}><RecipeGuide /><Handle type="source" position={Position.Right} /></div>;
+  const { select, selected } = useContext(Actions);
+  return <div className={`recipe-label ${selected === recipeConcept.id ? 'selected' : ''}`} style={{ height: recipeBoxHeight }}><button className="nodrag" onClick={() => select(recipeConcept.id)} aria-label={`Open ${recipeConcept.title}`} aria-pressed={selected === recipeConcept.id}><strong>{recipeConcept.title}</strong><span>{recipeConcept.subtitle}</span><span className="recipe-open">View steps & functions <ArrowUpRight size={12} /></span></button><Handle type="source" position={Position.Right} /></div>;
 }
 const nodeTypes = { concept: ConceptNode, phase: PhaseNode, summary: SummaryNode, recipeLabel: RecipeLabelNode };
 function RecipeConnector({ id, sourceX, sourceY, targetX, targetY, data, markerEnd, style }) {
@@ -98,9 +99,11 @@ function DetailPanel({ selected, close }) {
     <div className="panel-body" key={selected}>
       <div className="eyebrow" style={{ color: phase.color }}>{phase.number} / {phase.title}</div>
       <h2>{step.title}</h2>
+      {selected === recipeConcept.id ? <RecipeGuide /> : <>
       <section className="step-description"><h3>Inputs</h3><p>{step.input}</p></section>
       <section className="step-description"><h3>What to do</h3>{step.purposeSections ? step.purposeSections.map(section => <div className="step-subsection" key={section.title}><h4>{section.title}</h4><p>{section.description}</p></div>) : <p>{step.purpose}</p>}</section>
       <section className="step-description"><h3>Outputs</h3><p>{step.output}</p></section>
+      </>}
     </div>
   </>;
 }
@@ -119,7 +122,7 @@ export default function App() {
   const searchRef = useRef(null);
   const graph = useMemo(() => makeGraph(expanded), [expanded]);
   const scale = Math.min(1, Math.max(0.3, (width - 52) / graphWidth));
-  const matches = query.trim() ? steps.filter(step => `${step.title} ${step.subtitle} ${step.input} ${step.purpose} ${step.purposeSections?.map(section => `${section.title} ${section.description}`).join(' ') || ''} ${step.output}`.toLowerCase().includes(query.trim().toLowerCase())) : [];
+  const matches = query.trim() ? [...steps, recipeConcept].filter(step => `${step.title} ${step.subtitle} ${step.input || ''} ${step.purpose || ''} ${step.purposeSections?.map(section => `${section.title} ${section.description}`).join(' ') || ''} ${step.output || ''} ${step.id === recipeConcept.id ? recipeGuide.map(item => `${item.title} ${item.description} ${item.tools || ''}`).join(' ') : ''}`.toLowerCase().includes(query.trim().toLowerCase())) : [];
   function select(id) {
     setSelected(id); setExpanded(prev => new Set([...prev, byId[id].phase])); setQuery(''); setDetailOpen(true);
     if (location.hash !== `#${id}`) location.hash = id;
@@ -143,7 +146,7 @@ export default function App() {
       <section className="map-pane" aria-label="Analytics workflow">
         <div className="map-legend"><span><i />{steps.length} connected concepts</span><button className={highlight ? 'active' : ''} onClick={() => setHighlight(!highlight)} aria-pressed={highlight}><span className="recipe-dot" />Shared preprocessing recipe</button></div>
         <div className="map-scroll" ref={canvas}>
-          {view === 'map' ? <div className="flow-wrapper" style={{ height: graph.height * scale + 50 }}><ReactFlow nodes={graph.nodes} edges={graph.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} viewport={{ x: (width - graphWidth * scale) / 2, y: 22, zoom: scale }} minZoom={0.2} maxZoom={1.5} nodesDraggable={false} nodesConnectable={false} elementsSelectable={false} panOnDrag={false} zoomOnScroll={false} zoomOnPinch={false} zoomOnDoubleClick={false} preventScrolling={false} nodesFocusable={false} edgesFocusable={false} onNodeClick={(_, node) => { if (byId[node.id]) select(node.id); }} /></div> : <div className="reading-view">{phases.map(phase => <section key={phase.id} style={{ '--accent': phase.color }}><button className="reading-heading" onClick={() => toggle(phase.id)} aria-expanded={expanded.has(phase.id)}><span>{phase.number}</span><strong>{phase.title}</strong><ChevronDown size={18} /></button><p>{phase.summary}</p>{phase.id === 'model' && expanded.has(phase.id) && <details className="reading-recipe-guide"><summary>Preprocessing recipe — quick guide</summary><div className="recipe-label"><RecipeGuide /></div></details>}{expanded.has(phase.id) && steps.filter(step => step.phase === phase.id).map(step => <button className={`reading-step ${selected === step.id ? 'selected' : ''} ${highlight && step.recipe ? 'recipe-highlight' : ''}`} key={step.id} onClick={() => select(step.id)}><span><strong>{step.title}</strong><small>{step.subtitle}</small></span>{step.recipe ? <span className="reading-recipe">RECIPE</span> : <ArrowUpRight size={16} />}</button>)}</section>)}</div>}
+          {view === 'map' ? <div className="flow-wrapper" style={{ height: graph.height * scale + 50 }}><ReactFlow nodes={graph.nodes} edges={graph.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} viewport={{ x: (width - graphWidth * scale) / 2, y: 22, zoom: scale }} minZoom={0.2} maxZoom={1.5} nodesDraggable={false} nodesConnectable={false} elementsSelectable={false} panOnDrag={false} zoomOnScroll={false} zoomOnPinch={false} zoomOnDoubleClick={false} preventScrolling={false} nodesFocusable={false} edgesFocusable={false} onNodeClick={(_, node) => { if (byId[node.id]) select(node.id); }} /></div> : <div className="reading-view">{phases.map(phase => <section key={phase.id} style={{ '--accent': phase.color }}><button className="reading-heading" onClick={() => toggle(phase.id)} aria-expanded={expanded.has(phase.id)}><span>{phase.number}</span><strong>{phase.title}</strong><ChevronDown size={18} /></button><p>{phase.summary}</p>{phase.id === 'model' && expanded.has(phase.id) && <button className="reading-recipe-guide" onClick={() => select(recipeConcept.id)} aria-pressed={selected === recipeConcept.id}><strong>{recipeConcept.title}</strong><span>{recipeConcept.subtitle}</span><span className="recipe-open">View steps & functions <ArrowUpRight size={14} /></span></button>}{expanded.has(phase.id) && steps.filter(step => step.phase === phase.id).map(step => <button className={`reading-step ${selected === step.id ? 'selected' : ''} ${highlight && step.recipe ? 'recipe-highlight' : ''}`} key={step.id} onClick={() => select(step.id)}><span><strong>{step.title}</strong><small>{step.subtitle}</small></span>{step.recipe ? <span className="reading-recipe">RECIPE</span> : <ArrowUpRight size={16} />}</button>)}</section>)}</div>}
           <div className="map-footer"><span>START WITH THE QUESTION. FINISH WITH THE DECISION.</span><p>Open any step for its inputs, what to do, and outputs.</p></div>
         </div>
       </section>

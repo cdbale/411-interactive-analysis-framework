@@ -25,20 +25,21 @@
 
 .step-description{padding:21px 0;border-bottom:1px solid #e4e9dd}.step-description h3{font-size:11px;letter-spacing:1px;text-transform:uppercase;margin:0 0 10px;color:#4c6840}.step-description p{font-size:14px;line-height:1.8;color:#5f7052;margin:0}.step-description:last-child{border-bottom:0}
 
-.recipe-label{width:160px;height:28px;display:flex;align-items:center;justify-content:center;border:1px dashed #8aa17c;border-radius:5px;background:#edf3e6;color:#47633b;font-size:11px;font-weight:600;position:relative;}
-
-.recipe-label{width:170px;height:76px;flex-direction:column;gap:7px;padding:12px;text-align:center;border-radius:12px;box-shadow:0 2px 6px #203e2c08}.recipe-label strong{font-size:12px;font-weight:600}.recipe-label span{font-size:9px;font-weight:400;line-height:1.5;color:#687d5d}
-
+.recipe-label{width:170px;position:relative;border:1px dashed #8aa17c;border-radius:12px;background:#edf3e6;color:#47633b;box-shadow:0 2px 6px #203e2c08}
+.recipe-label button{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:14px 12px;text-align:left;border:0;background:transparent;color:inherit;border-radius:inherit;cursor:pointer}
+.recipe-label strong{font-size:13px;font-weight:600;line-height:1.3}
+.recipe-label span{font-size:11px;line-height:1.5;color:#526947}
+.recipe-label:hover,.recipe-label.selected,.reading-recipe-guide:hover,.reading-recipe-guide[aria-pressed=true]{border-color:#47633b;background:#e1ecd8;box-shadow:0 0 0 2px #65865b24}
+.recipe-open{display:flex;align-items:center;gap:4px;font-weight:600}
 .step-subsection + .step-subsection{margin-top:18px}.step-subsection h4{font-size:14px;font-weight:600;color:#3f5b34;margin:0 0 6px;}
 .revision-label{font-size:11px;fill:#8a6025;paint-order:stroke;stroke:#f3f5ee;stroke-width:5px;stroke-linejoin:round}
 .recipe-edge-label{font-size:10px;fill:#47633b;paint-order:stroke;stroke:#f3f5ee;stroke-width:5px;stroke-linejoin:round}
-.recipe-label{display:block;text-align:left;padding:14px 12px;font-size:10px;font-weight:400;line-height:1.45}
-.recipe-label .recipe-guide-title{font-size:13px;display:block;line-height:1.3}
-.recipe-guide-intro,.recipe-guide-foot{margin:9px 0;color:#576f4c;font-size:10px}
-.recipe-label ul{list-style:none;padding:0;margin:12px 0}
-.recipe-label li{padding:9px 0;border-top:1px solid #d5e0cd}
-.recipe-label li strong{font-size:10px;font-weight:700}
-.recipe-label li p{margin:3px 0;font-size:10px}
-.recipe-label code{font-size:9px;overflow-wrap:anywhere;color:#3e6237}
-.recipe-guide-foot{border-top:1px solid #d5e0cd;padding-top:10px;margin-bottom:0}
-.reading-recipe-guide{margin:16px 0}.reading-recipe-guide summary{cursor:pointer;font-size:13px;color:#47633b}.reading-recipe-guide .recipe-label{width:100%;height:auto;margin-top:12px}.reading-recipe-guide .recipe-label li strong,.reading-recipe-guide .recipe-label li p,.reading-recipe-guide .recipe-guide-intro,.reading-recipe-guide .recipe-guide-foot{font-size:13px}.reading-recipe-guide .recipe-label code{font-size:12px}
+.recipe-guide{font-size:14px;line-height:1.7;color:#5f7052}
+.recipe-guide-intro{margin:0 0 16px}
+.recipe-guide ul{list-style:none;padding:0;margin:0}
+.recipe-guide li{padding:18px 0;border-top:1px solid #e4e9dd}
+.recipe-guide h3{font-size:14px;font-weight:600;color:#3f5b34;margin:0 0 6px}
+.recipe-guide li p{margin:0 0 8px}
+.recipe-guide code{font-size:12px;overflow-wrap:anywhere;color:#3e6237;background:#edf3e6;border-radius:4px;padding:3px 5px;box-decoration-break:clone}
+.recipe-guide-foot{border-top:1px solid #e4e9dd;padding-top:18px;margin:0}
+.reading-recipe-guide{display:flex;flex-direction:column;gap:8px;width:100%;margin:16px 0;padding:16px;text-align:left;border:1px dashed #8aa17c;border-radius:12px;background:#edf3e6;color:#47633b;cursor:pointer;font-size:13px;line-height:1.5}

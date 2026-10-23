@@ -38,7 +38,7 @@ function SummaryNode({ data }) {
   return <div className="summary-node" style={{ '--accent': data.color }}><Ports /><button className="nodrag" onClick={() => toggle(data.id)} aria-label={`Expand ${data.title}`}><strong>{data.title}</strong><span>{data.count} steps <ChevronDown size={14} /></span></button></div>;
 }
 function RecipeGuide() {
-  return <div className="recipe-guide"><p className="recipe-guide-intro">Choose steps for your variables; do not apply every step.</p><ul>{recipeGuide.map(item => <li key={item.title}><h3>{item.title}</h3><p>{item.description}</p>{item.tools && <code>{item.tools}</code>}</li>)}</ul><p className="recipe-guide-foot">Learn on training data. Reuse the finalized recipe for test data and counterfactuals.</p></div>;
+  return <div className="recipe-guide"><p className="recipe-guide-intro">Choose steps for your variables; do not apply every step.</p><ul>{recipeGuide.map(item => <li key={item.title}><h3>{item.title}</h3><p>{item.description}</p>{item.tools && <code>{item.tools}</code>}</li>)}</ul><p className="recipe-guide-foot">{recipeConcept.subtitle}</p></div>;
 }
 function RecipeLabelNode() {
   const { select, selected } = useContext(Actions);

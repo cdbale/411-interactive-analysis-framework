@@ -51,7 +51,7 @@ export const recipeGuide = [
 ];
 export const recipeConcept = {
   id: 'shared-recipe', phase: 'model', title: 'Preprocessing recipe',
-  subtitle: 'Learn on training data. Reuse for test data and counterfactuals.',
+  subtitle: 'Learn and revise on training data. Apply the finalized recipe to test data and counterfactuals.',
 };
 export const recipeBoxHeight = 150;
 export const graphWidth = 940;

@@ -40,6 +40,16 @@ export const edges = [
 ];
 
 export const recipeIds = ['prep-train', 'prep-test', 'prep-counter'];
+// Condensed from Lecture 10's Preprocessing Guide table.
+export const recipeGuide = [
+  { title: 'Missing values', description: 'Zeros are not missing. Drop missing rows or justify another strategy.', tools: 'drop_na()' },
+  { title: 'Continuous predictors', description: 'If skewed, test whether a log transformation helps.', tools: 'step_log(..., offset = 1)' },
+  { title: 'Binary predictors', description: 'Keep 0/1, with 0 as the reference. Do not log or add another indicator.' },
+  { title: 'Categorical predictors', description: 'Choose a reference level; create k − 1 indicators.', tools: 'fct_relevel() → step_dummy()' },
+  { title: 'Continuous outcome', description: 'If skewed, compare raw and logged models. Reverse log(x + 1) predictions with exp(.pred) − 1.', tools: 'step_log(..., offset = 1)' },
+  { title: 'Optional numeric tools', description: 'Standardize scales, remove highly correlated inputs, or create bins.', tools: 'step_normalize() / step_corr() / step_discretize()' },
+];
+export const recipeBoxHeight = 780;
 export const graphWidth = 940;
 export const byId = Object.fromEntries(steps.map(step => [step.id, step]));
 
@@ -90,8 +100,9 @@ export function makeGraph(expanded) {
   const visibleRecipeNodes = nodes.filter(node => recipeIds.includes(node.id));
   if (visibleRecipeNodes.length) {
     const centers = visibleRecipeNodes.map(node => node.position.y + 54.5);
-    nodes.push({ id: 'shared-recipe', type: 'recipeLabel', position: { x: 0, y: (Math.min(...centers) + Math.max(...centers)) / 2 - 38 }, data: {}, draggable: false });
+    nodes.push({ id: 'shared-recipe', type: 'recipeLabel', position: { x: 0, y: Math.max(0, (Math.min(...centers) + Math.max(...centers)) / 2 - recipeBoxHeight / 2) }, data: {}, draggable: false });
   }
   const recipeEdges = visibleRecipeNodes.map(node => ({ id: `recipe-use-${node.id}`, source: 'shared-recipe', target: node.id, targetHandle: 'recipe', type: 'recipeConnector', data: { routeAbove: node.id === 'prep-test', label: node.id === 'prep-train' ? 'Learn/revise' : 'Apply finalized recipe' }, markerEnd: { type: 'arrowclosed', width: 13, height: 13 }, style: { stroke: '#65865b', strokeWidth: 1.5, strokeDasharray: '4 3' } }));
-  return { nodes, edges: [...workflowEdges, ...recipeEdges], height: top + 15 };
+  const recipeBox = nodes.find(node => node.id === 'shared-recipe');
+  return { nodes, edges: [...workflowEdges, ...recipeEdges], height: Math.max(top + 15, recipeBox ? recipeBox.position.y + recipeBoxHeight + 30 : 0) };
 }
